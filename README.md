@@ -1,1 +1,1 @@
-1
+[![.github/workflows/blank.yml](https://github.com/carlosandrefirmino35-blip/PC-Virtual-gr-tis/actions/workflows/blank.yml/badge.svg)](https://github.com/carlosandrefirmino35-blip/PC-Virtual-gr-tis/actions/workflows/blank.yml)
