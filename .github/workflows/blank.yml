@@ -1,0 +1,63 @@
+
+# PC Virtual Gamer - VirtualBox
+# Execute com o VirtualBox instalado.
+
+$VBox = "$env:ProgramFiles\Oracle\VirtualBox\VBoxManage.exe"
+$Nome = "PC-Gamer-Virtual"
+$Pasta = "$env:USERPROFILE\VirtualMachines\$Nome"
+$Disco = "$Pasta\Windows.vdi"
+
+if (!(Test-Path $VBox)) {
+    throw "VirtualBox não encontrado. Instale-o primeiro."
+}
+
+New-Item -ItemType Directory -Force -Path $Pasta |
+    Out-Null
+
+# Cria a máquina virtual
+& $VBox createvm --name $Nome --ostype Windows11_64 `
+    --basefolder "$env:USERPROFILE\VirtualMachines" --register
+
+if ($LASTEXITCODE -ne 0) {
+    throw "Falha ao criar a máquina virtual."
+}
+
+# Configuração de hardware virtual
+& $VBox modifyvm $Nome `
+    --memory 8192 `
+    --cpus 4 `
+    --vram 128 `
+    --graphicscontroller vboxsvga `
+    --firmware efi `
+    --ioapic on `
+    --boot1 dvd `
+    --boot2 disk `
+    --boot3 none `
+    --boot4 none
+
+# Cria disco virtual de 100 GB
+& $VBox createmedium disk `
+    --filename $Disco `
+    --size 102400 `
+    --format VDI
+
+if ($LASTEXITCODE -ne 0) {
+    throw "Falha ao criar o disco virtual."
+}
+
+# Controladora e disco
+& $VBox storagectl $Nome `
+    --name SATA `
+    --add sata `
+    --controller IntelAhci
+
+& $VBox storageattach $Nome `
+    --storagectl SATA `
+    --port 0 `
+    --device 0 `
+    --type hdd `
+    --medium $Disco
+
+Write-Host "VM criada! Agora configure a ISO do Windows."
+Write-Host "Nome: $Nome"
+Write-Host "RAM: 8 GB | CPUs: 4 | Disco: 100 GB"
